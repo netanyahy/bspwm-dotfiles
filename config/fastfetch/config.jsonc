@@ -11,7 +11,7 @@
     }
   },
   "display": {
-    "separator": "  ->  ",
+    "separator": " -> ",
     "color": {
       "keys": "white",
       "title": "white",
