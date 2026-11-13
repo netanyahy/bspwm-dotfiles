@@ -1,0 +1,24 @@
+#!/bin/sh
+
+# Проверяем наличие flameshot
+if command -v flameshot >/dev/null 2>&1; then
+    flameshot gui
+elif command -v maim >/dev/null 2>&1; then
+    TARGET_DIR="${XDG_PICTURES_DIR:-$HOME/Pictures}/Screenshots"
+    mkdir -p "$TARGET_DIR"
+    FILE="$TARGET_DIR/screenshot_$(date +%Y%m%d_%H%M%S).png"
+    if command -v xclip >/dev/null 2>&1; then
+        maim -s | tee "$FILE" | xclip -selection clipboard -t image/png
+    else
+        maim -s "$FILE"
+    fi
+    notify-send "Скриншот сохранён" "$FILE" -t 2000
+elif command -v scrot >/dev/null 2>&1; then
+    TARGET_DIR="${XDG_PICTURES_DIR:-$HOME/Pictures}/Screenshots"
+    mkdir -p "$TARGET_DIR"
+    FILE="$TARGET_DIR/screenshot_$(date +%Y%m%d_%H%M%S).png"
+    scrot -s "$FILE"
+    notify-send "Скриншот сохранён" "$FILE" -t 2000
+else
+    notify-send -u critical "Скриншоттер не найден" "Для работы скриншотов установите flameshot:\ndoas emerge media-gfx/flameshot" -t 6000
+fi

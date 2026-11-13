@@ -6,14 +6,18 @@ super + Escape + r
 	
 # Launch Terminal
 super + Return
-    alacritty
+    kitty
 
 # Hide or Unhide Polybar
 super + p
 	sh $HOME/bin/toggle-polybar
 
-# Set random wallpaper
+# Launch Firefox
 super + w
+	firefox-bin
+
+# Set random wallpaper
+super + alt + w
 	sh $HOME/bin/random_wallpaper
 
 # Change language
@@ -70,7 +74,7 @@ ctrl + shift + {q,r}
     bspc {quit,wm -r}
 
 # close and kill
-super + c
+super + q
     bspc node -c
 
 # alternate between the tiled and monocle layout
@@ -139,5 +143,4 @@ super + ctrl + {m,x,y,z}
 # swap the current node and the biggest window
 super + g
 	bspc node -s biggest.window
-
 

@@ -55,6 +55,7 @@ fi
 if [ -n "$EXTERNAL_MONITOR" ]; then
   # set xrandr rules for docked setup
   xrandr --output "$INTERNAL_MONITOR" --mode 1920x1080 --pos 0x0 --rotate normal
+  xrandr --output "$EXTERNAL_MONITOR" --primary --mode 2560x1440 --rate 180 --pos 1920x0 --rotate normal --left-of "$INTERNAL_MONITOR" 2>/dev/null || \
   xrandr --output "$EXTERNAL_MONITOR" --primary --mode 2560x1440 --pos 1920x0 --rotate normal --left-of "$INTERNAL_MONITOR"
 
   if [[ $(bspc query -D -m "${EXTERNAL_MONITOR}" | wc -l) -ne 5 ]]; then
@@ -62,8 +63,9 @@ if [ -n "$EXTERNAL_MONITOR" ]; then
   fi
   bspc wm -O "$EXTERNAL_MONITOR" "$INTERNAL_MONITOR"
 else
-  # set xrandr rules for mobile setup
-  xrandr --output "$INTERNAL_MONITOR" --primary --mode 1920x1080 --pos 0x0 --rotate normal
+  # set xrandr rules for mobile / single setup
+  xrandr --output "$INTERNAL_MONITOR" --primary --mode 2560x1440 --rate 180 --pos 0x0 --rotate normal 2>/dev/null || \
+  xrandr --output "$INTERNAL_MONITOR" --primary --mode 2560x1440 --pos 0x0 --rotate normal
   if [[ $(bspc query -D -m "${INTERNAL_MONITOR}" | wc -l) -ne 10 ]]; then
     monitor_remove
   fi
