@@ -64,10 +64,11 @@ GENTOO_PKGS=(
     "x11-apps/xrdb"
     "x11-apps/setxkbmap"
     
-    # Audio, screenshot, brightness
+    # Audio, screenshot, brightness, system fetch
     "media-sound/pavucontrol"
     "media-gfx/flameshot"
     "x11-misc/brightnessctl"
+    "app-misc/fastfetch"
     
     # Fonts
     "media-fonts/jetbrains-mono"
@@ -127,7 +128,7 @@ mkdir -p "$HOME/.config"
 mkdir -p "$HOME/bin"
 
 # Backup and copy configs
-for dir in bspwm sxhkd polybar dunst rofi; do
+for dir in bspwm sxhkd polybar dunst rofi fastfetch; do
     if [ -d "$HOME/.config/$dir" ]; then
         mkdir -p "$BACKUP_DIR"
         echo -e "${C_YELLOW}[!] Резервная копия ~/.config/$dir -> $BACKUP_DIR/$dir${C_RESET}"

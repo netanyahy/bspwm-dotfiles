@@ -1,0 +1,36 @@
+{
+  "$schema": "https://raw.githubusercontent.com/fastfetch-cli/fastfetch/2.66.0/doc/json_schema.json",
+  "logo": {
+    "source": "Linux",
+    "type": "builtin",
+    "position": "left",
+    "padding": {
+      "top": 0,
+      "left": 0,
+      "right": 2
+    }
+  },
+  "display": {
+    "separator": "  ->  ",
+    "color": {
+      "keys": "white",
+      "title": "white",
+      "output": "white",
+      "separator": "white"
+    }
+  },
+  "modules": [
+    "title",
+    "host",
+    "os",
+    "kernel",
+    "swap",
+    "cpu",
+    "gpu",
+    "packages",
+    "uptime",
+    "datetime",
+    "wm",
+    "de"
+  ]
+}

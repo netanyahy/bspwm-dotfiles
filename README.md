@@ -38,7 +38,7 @@ git clone https://github.com/netanyahy/bspwm-dotfiles.git ~/.dotfiles && cd ~/.d
 ```
 
 ### Что делает скрипт:
-1. Предлагает установить необходимые пакеты через `emerge` (`bspwm`, `sxhkd`, `polybar`, `picom`, `dunst`, `rofi`, `kitty`, `feh`, `flameshot`, `jetbrains-mono`, `symbols-nerd-font` и др.).
+1. Предлагает установить необходимые пакеты через `emerge` (`bspwm`, `sxhkd`, `polybar`, `picom`, `dunst`, `rofi`, `kitty`, `fastfetch`, `feh`, `flameshot`, `jetbrains-mono`, `symbols-nerd-font` и др.).
 2. **Интерактивно определяет и запрашивает разрешение экрана и герцовку** (например, `2560x1440 @ 180Hz` или `1920x1080 @ 60Hz`) и автоматически сохраняет в `~/.config/bspwm/monitor.conf`.
 3. Делает резервную копию существующих конфигураций в `~/.config/dotfiles_backup_*`.
 4. Копирует актуальные настройки в `~/.config/` и скрипты в `~/bin/`.
