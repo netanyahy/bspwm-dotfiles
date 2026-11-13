@@ -12,6 +12,7 @@
   separator_height = 2
   frame_color = "#161320"
   separator_color = "#161320"
+  highlight = "#ffffff"
 
   sort = no
   font = JetBrainsMono Nerd Font 15
@@ -39,18 +40,21 @@
 
 [urgency_low]
   background = "#1E1E2E"
-  frame_color = "#989CFA"
+  frame_color = "#ffffff"
   foreground = "#D9E0EE"
+  highlight = "#ffffff"
   timeout = 5
 
 [urgency_normal]
   background = "#1E1E2E"
-  frame_color = "#989CFA"
+  frame_color = "#ffffff"
   foreground = "#D9E0EE"
+  highlight = "#ffffff"
   timeout = 5
 
 [urgency_critical]
   background = "#1E1E2E"
-  frame_color = "#989CFA"
+  frame_color = "#ffffff"
   foreground = "#D9E0EE"
+  highlight = "#ffffff"
   timeout = 10

@@ -1,60 +1,155 @@
 #!/bin/bash
 
-## Script To Manage Speaker Volume.
+## Script To Manage Speaker Volume with Dunst OSD.
 
-# Get Volume
+USE_WPCTL=0
+USE_PACTL=0
+
+if command -v wpctl >/dev/null 2>&1; then
+    USE_WPCTL=1
+elif command -v pactl >/dev/null 2>&1; then
+    USE_PACTL=1
+fi
+
+# Get Volume percentage (integer, e.g. 45)
 get_volume() {
-	volume=$(echo $(pamixer --get-volume))
-	echo "$volume"
+    local vol=0
+    if [[ $USE_WPCTL -eq 1 ]]; then
+        local raw
+        raw=$(wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null)
+        if [[ -n "$raw" ]]; then
+            vol=$(echo "$raw" | awk '{printf "%d", ($2 * 100 + 0.5)}')
+        fi
+    elif [[ $USE_PACTL -eq 1 ]]; then
+        vol=$(pactl get-sink-volume @DEFAULT_SINK@ 2>/dev/null | grep -Po '[0-9]+(?=%)' | head -n 1)
+    fi
+    echo "${vol:-0}"
+}
+
+is_muted() {
+    if [[ $USE_WPCTL -eq 1 ]]; then
+        wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null | grep -q '\[MUTED\]' && return 0
+    elif [[ $USE_PACTL -eq 1 ]]; then
+        pactl get-sink-mute @DEFAULT_SINK@ 2>/dev/null | grep -q 'yes' && return 0
+    fi
+    return 1
 }
 
 # Get icons
 get_icon() {
-	vol="$(get_volume)"
-	current="${vol%%%}"
-	if [[ "$current" -eq "0" ]]; then
-		icon='/usr/share/icons/Papirus-Dark/symbolic/status/audio-volume-muted-symbolic.svg'
-	elif [[ ("$current" -ge "0") && ("$current" -le "30") ]]; then
-		icon='/usr/share/icons/Papirus-Dark/symbolic/status/audio-volume-low-symbolic.svg'
-	elif [[ ("$current" -ge "30") && ("$current" -le "60") ]]; then
-		icon='/usr/share/icons/Papirus-Dark/symbolic/status/audio-volume-medium-symbolic.svg'
-	elif [[ ("$current" -ge "60") && ("$current" -le "90") ]]; then
-		icon='/usr/share/icons/Papirus-Dark/symbolic/status/audio-volume-high-symbolic.svg'
-	elif [[ ("$current" -ge "90") && ("$current" -le "100") ]]; then
-		icon='/usr/share/icons/Papirus-Dark/symbolic/status/audio-volume-overamplified-symbolic.svg'
-	fi
+    local vol
+    vol="$(get_volume)"
+    local current="${vol%%%}"
+
+    local icon_base="$HOME/.config/bspwm/assets/icons/volume"
+    if [[ ! -d "$icon_base" ]]; then
+        icon_base="/usr/share/icons/Papirus-Dark/symbolic/status"
+        if [[ ! -d "$icon_base" ]]; then
+            icon_base="/usr/share/icons/Adwaita/symbolic/status"
+        fi
+    fi
+
+    if [[ "$current" -le 0 ]]; then
+        icon="${icon_base}/audio-volume-muted-symbolic.svg"
+    elif [[ "$current" -le 30 ]]; then
+        icon="${icon_base}/audio-volume-low-symbolic.svg"
+    elif [[ "$current" -le 60 ]]; then
+        icon="${icon_base}/audio-volume-medium-symbolic.svg"
+    elif [[ "$current" -le 100 ]]; then
+        icon="${icon_base}/audio-volume-high-symbolic.svg"
+    else
+        icon="${icon_base}/audio-volume-overamplified-symbolic.svg"
+    fi
+
+    if [[ ! -f "$icon" ]]; then
+        if [[ "$current" -le 0 ]]; then
+            icon="audio-volume-muted"
+        elif [[ "$current" -le 30 ]]; then
+            icon="audio-volume-low"
+        elif [[ "$current" -le 60 ]]; then
+            icon="audio-volume-medium"
+        else
+            icon="audio-volume-high"
+        fi
+    fi
+}
+
+get_mute_icon() {
+    local icon_base="$HOME/.config/bspwm/assets/icons/volume"
+    if [[ ! -d "$icon_base" ]]; then
+        icon_base="/usr/share/icons/Papirus-Dark/symbolic/status"
+        if [[ ! -d "$icon_base" ]]; then
+            icon_base="/usr/share/icons/Adwaita/symbolic/status"
+        fi
+    fi
+    if [[ -f "${icon_base}/audio-volume-muted-symbolic.svg" ]]; then
+        echo "${icon_base}/audio-volume-muted-symbolic.svg"
+    else
+        echo "audio-volume-muted"
+    fi
+}
+
+notify_volume() {
+    local vol
+    vol="$(get_volume)"
+    get_icon
+    dunstify -a "volume" -u low --replace=69 -h int:value:"$vol" -h string:hlcolor:"#ffffff" -i "$icon" "Volume: ${vol}%"
 }
 
 # Increase Volume
 up_volume() {
-	pamixer -i 2 --unmute && get_icon && dunstify -u low --replace=69 -i "$icon" "Volume : $(get_volume)%"
+    if [[ $USE_WPCTL -eq 1 ]]; then
+        wpctl set-volume -l 1.5 @DEFAULT_AUDIO_SINK@ 2%+
+        wpctl set-mute @DEFAULT_AUDIO_SINK@ 0
+    elif [[ $USE_PACTL -eq 1 ]]; then
+        pactl set-sink-volume @DEFAULT_SINK@ +2%
+        pactl set-sink-mute @DEFAULT_SINK@ 0
+    fi
+    notify_volume
 }
 
 # Decrease Volume
 down_volume() {
-	pamixer -d 2 --unmute && get_icon && dunstify -u low --replace=69 -i "$icon" "Volume : $(get_volume)%"
+    if [[ $USE_WPCTL -eq 1 ]]; then
+        wpctl set-volume @DEFAULT_AUDIO_SINK@ 2%-
+        wpctl set-mute @DEFAULT_AUDIO_SINK@ 0
+    elif [[ $USE_PACTL -eq 1 ]]; then
+        pactl set-sink-volume @DEFAULT_SINK@ -2%
+        pactl set-sink-mute @DEFAULT_SINK@ 0
+    fi
+    notify_volume
 }
 
 # Toggle Mute
 toggle_mute() {
-    status=$(pamixer --get-mute)
+    if [[ $USE_WPCTL -eq 1 ]]; then
+        wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
+    elif [[ $USE_PACTL -eq 1 ]]; then
+        pactl set-sink-mute @DEFAULT_SINK@ toggle
+    fi
 
-	if [[ "$status" == "true" ]]; then
-		pamixer --unmute && get_icon && dunstify -u low --replace=69 -i "$icon" "Unmute"
-	else
-		pamixer --mute && dunstify -u low --replace=69 -i '/usr/share/icons/Papirus-Dark/symbolic/status/audio-volume-muted-symbolic.svg' "Mute"
-	fi
+    if is_muted; then
+        dunstify -a "volume" -u low --replace=69 -h int:value:0 -h string:hlcolor:"#ffffff" -i "$(get_mute_icon)" "Volume" "Muted"
+    else
+        notify_volume
+    fi
 }
 
 # Execute accordingly
-if [[ "$1" == "--get" ]]; then
-	get_volume
-elif [[ "$1" == "--up" ]]; then
-	up_volume
-elif [[ "$1" == "--down" ]]; then
+case "$1" in
+    --get)
+        get_volume
+        ;;
+    --up)
+        up_volume
+        ;;
+    --down)
         down_volume
-elif [[ "$1" == "--toggle" ]]; then
-	toggle_mute
-else
-	get_volume
-fi
+        ;;
+    --toggle)
+        toggle_mute
+        ;;
+    *)
+        get_volume
+        ;;
+esac

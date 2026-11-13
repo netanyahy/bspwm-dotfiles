@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+[ -z "$DISPLAY" ] && export DISPLAY=:1
+[ -z "$XAUTHORITY" ] && [ -f "$HOME/.Xauthority" ] && export XAUTHORITY="$HOME/.Xauthority"
+
 # Terminate already running bar instances
 killall -q polybar
 
