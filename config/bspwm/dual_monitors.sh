@@ -14,6 +14,14 @@ if [ -z "$INTERNAL_MONITOR" ]; then
   EXTERNAL_MONITOR=""
 fi
 
+# Load user-configured resolution and refresh rate if present
+if [ -f "$HOME/.config/bspwm/monitor.conf" ]; then
+  . "$HOME/.config/bspwm/monitor.conf"
+fi
+
+PRIMARY_MODE="${PRIMARY_MODE:-2560x1440}"
+PRIMARY_RATE="${PRIMARY_RATE:-180}"
+
 monitor_add() {
   # Move first 5 desktops to external monitor
   for desktop in $(bspc query -D --names -m "$INTERNAL_MONITOR" | sed 5q); do
@@ -55,8 +63,9 @@ fi
 if [ -n "$EXTERNAL_MONITOR" ]; then
   # set xrandr rules for docked setup
   xrandr --output "$INTERNAL_MONITOR" --mode 1920x1080 --pos 0x0 --rotate normal
-  xrandr --output "$EXTERNAL_MONITOR" --primary --mode 2560x1440 --rate 180 --pos 1920x0 --rotate normal --left-of "$INTERNAL_MONITOR" 2>/dev/null || \
-  xrandr --output "$EXTERNAL_MONITOR" --primary --mode 2560x1440 --pos 1920x0 --rotate normal --left-of "$INTERNAL_MONITOR"
+  xrandr --output "$EXTERNAL_MONITOR" --primary --mode "$PRIMARY_MODE" --rate "$PRIMARY_RATE" --pos 1920x0 --rotate normal --left-of "$INTERNAL_MONITOR" 2>/dev/null || \
+  xrandr --output "$EXTERNAL_MONITOR" --primary --mode "$PRIMARY_MODE" --pos 1920x0 --rotate normal --left-of "$INTERNAL_MONITOR" 2>/dev/null || \
+  xrandr --output "$EXTERNAL_MONITOR" --primary --auto
 
   if [[ $(bspc query -D -m "${EXTERNAL_MONITOR}" | wc -l) -ne 5 ]]; then
     monitor_add
@@ -64,8 +73,9 @@ if [ -n "$EXTERNAL_MONITOR" ]; then
   bspc wm -O "$EXTERNAL_MONITOR" "$INTERNAL_MONITOR"
 else
   # set xrandr rules for mobile / single setup
-  xrandr --output "$INTERNAL_MONITOR" --primary --mode 2560x1440 --rate 180 --pos 0x0 --rotate normal 2>/dev/null || \
-  xrandr --output "$INTERNAL_MONITOR" --primary --mode 2560x1440 --pos 0x0 --rotate normal
+  xrandr --output "$INTERNAL_MONITOR" --primary --mode "$PRIMARY_MODE" --rate "$PRIMARY_RATE" --pos 0x0 --rotate normal 2>/dev/null || \
+  xrandr --output "$INTERNAL_MONITOR" --primary --mode "$PRIMARY_MODE" --pos 0x0 --rotate normal 2>/dev/null || \
+  xrandr --output "$INTERNAL_MONITOR" --primary --auto
   if [[ $(bspc query -D -m "${INTERNAL_MONITOR}" | wc -l) -ne 10 ]]; then
     monitor_remove
   fi

@@ -74,7 +74,7 @@ GENTOO_PKGS=(
     "media-fonts/symbols-nerd-font"
 )
 
-echo -e "\n${C_PURPLE}[1/4] Установка пакетов Gentoo через emerge...${C_RESET}"
+echo -e "\n${C_PURPLE}[1/5] Установка пакетов Gentoo через emerge...${C_RESET}"
 echo -e "${C_YELLOW}Будут установлены следующие пакеты:${C_RESET}"
 for pkg in "${GENTOO_PKGS[@]}"; do
     echo "  - $pkg"
@@ -89,8 +89,37 @@ else
     echo -e "${C_YELLOW}[-] Пропуск установки пакетов emerge.${C_RESET}"
 fi
 
-# 3. Deploy Dotfiles
-echo -e "\n${C_PURPLE}[2/4] Развёртывание конфигураций...${C_RESET}"
+# 3. Screen Resolution Setup
+echo -e "\n${C_PURPLE}[2/5] Настройка разрешения экрана...${C_RESET}"
+DEF_RES="2560x1440"
+DEF_RATE="180"
+
+# Auto-detect available resolution and rate via xrandr
+if command -v xrandr >/dev/null 2>&1; then
+    DETECTED_RES=$(xrandr 2>/dev/null | grep -E '^[ ]+[0-9]+x[0-9]+' | awk '{print $1}' | head -n1)
+    DETECTED_RATE=$(xrandr 2>/dev/null | grep -E '^[ ]+[0-9]+x[0-9]+.*(\*|\+)' | awk '{for(i=2;i<=NF;i++) if($i ~ /[*+]/) {gsub(/[*+]/,"",$i); print int($i); exit}}')
+    [ -n "$DETECTED_RES" ] && DEF_RES="$DETECTED_RES"
+    [ -n "$DETECTED_RATE" ] && DEF_RATE="$DETECTED_RATE"
+fi
+
+echo -e "${C_BLUE}[*] Обнаруженное/рекомендуемое разрешение:${C_RESET} ${C_BOLD}${DEF_RES}${C_RESET} (${DEF_RATE} Hz)"
+read -p "Введите ваше разрешение экрана [по умолчанию: $DEF_RES]: " USER_RES
+USER_RES="${USER_RES:-$DEF_RES}"
+
+read -p "Введите частоту обновления (Hz) [по умолчанию: $DEF_RATE, или Enter]: " USER_RATE
+USER_RATE="${USER_RATE:-$DEF_RATE}"
+
+echo -e "${C_GREEN}[+] Сохраняем разрешение: ${USER_RES} @ ${USER_RATE}Hz${C_RESET}"
+
+mkdir -p "$HOME/.config/bspwm"
+cat << EOF > "$HOME/.config/bspwm/monitor.conf"
+# Monitor resolution and refresh rate
+PRIMARY_MODE="$USER_RES"
+PRIMARY_RATE="$USER_RATE"
+EOF
+
+# 4. Deploy Dotfiles
+echo -e "\n${C_PURPLE}[3/5] Развёртывание конфигураций...${C_RESET}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BACKUP_DIR="$HOME/.config/dotfiles_backup_$(date +%Y%m%d_%H%M%S)"
 
@@ -110,6 +139,13 @@ for dir in bspwm sxhkd polybar dunst rofi; do
     fi
 done
 
+# Keep user's chosen monitor.conf
+cat << EOF > "$HOME/.config/bspwm/monitor.conf"
+# Monitor resolution and refresh rate
+PRIMARY_MODE="$USER_RES"
+PRIMARY_RATE="$USER_RATE"
+EOF
+
 # Copy bin scripts
 echo -e "${C_GREEN}[+] Копирование утилит bin/ -> ~/bin/${C_RESET}"
 cp -r "$SCRIPT_DIR/bin/"* "$HOME/bin/"
@@ -118,6 +154,16 @@ chmod +x "$HOME/.config/bspwm/bspwmrc"
 chmod +x "$HOME/.config/bspwm/dual_monitors.sh"
 chmod +x "$HOME/.config/polybar/launch.sh"
 
+# Apply resolution immediately if X11 is running
+if command -v xrandr >/dev/null 2>&1 && [ -n "$DISPLAY" ]; then
+    PRIMARY_MON=$(xrandr --query 2>/dev/null | awk '/ connected/{print $1; exit}')
+    if [ -n "$PRIMARY_MON" ]; then
+        echo -e "${C_BLUE}[*] Применяем разрешение ${USER_RES} к ${PRIMARY_MON}...${C_RESET}"
+        xrandr --output "$PRIMARY_MON" --mode "$USER_RES" --rate "$USER_RATE" 2>/dev/null || \
+        xrandr --output "$PRIMARY_MON" --mode "$USER_RES" 2>/dev/null || true
+    fi
+fi
+
 # Copy Xresources if present
 if [ -f "$SCRIPT_DIR/Xresources" ]; then
     echo -e "${C_GREEN}[+] Копирование Xresources -> ~/.Xresources${C_RESET}"
@@ -125,8 +171,8 @@ if [ -f "$SCRIPT_DIR/Xresources" ]; then
     xrdb merge "$HOME/.Xresources" 2>/dev/null || true
 fi
 
-# 4. PATH Verification
-echo -e "\n${C_PURPLE}[3/4] Проверка переменной PATH...${C_RESET}"
+# 5. PATH Verification
+echo -e "\n${C_PURPLE}[4/5] Проверка переменной PATH...${C_RESET}"
 if [[ ":$PATH:" != *":$HOME/bin:"* ]]; then
     echo -e "${C_YELLOW}[!] Добавляем ~/bin в PATH...${C_RESET}"
     if [ -f "$HOME/.bashrc" ]; then
@@ -141,8 +187,8 @@ if [[ ":$PATH:" != *":$HOME/bin:"* ]]; then
     fi
 fi
 
-# 5. Wallpapers
-echo -e "\n${C_PURPLE}[4/4] Настройка обоев...${C_RESET}"
+# 6. Wallpapers
+echo -e "\n${C_PURPLE}[5/5] Настройка обоев...${C_RESET}"
 mkdir -p "$HOME/Images"
 if [ -d "$SCRIPT_DIR/wallpapers" ] && [ "$(ls -A "$SCRIPT_DIR/wallpapers" 2>/dev/null)" ]; then
     echo -e "${C_GREEN}[+] Копирование обоев в ~/Images/...${C_RESET}"
@@ -151,6 +197,7 @@ fi
 
 echo -e "\n${C_GREEN}${C_BOLD}================================================================${C_RESET}"
 echo -e "${C_GREEN}${C_BOLD} Установка Gentoo BSPWM Rice успешно завершена! ${C_RESET}"
+echo -e "${C_GREEN}${C_BOLD} Разрешение экрана: ${USER_RES} @ ${USER_RATE}Hz ${C_RESET}"
 echo -e "${C_GREEN}${C_BOLD}================================================================${C_RESET}"
 echo -e "${C_BLUE}Для запуска BSPWM добавьте в ~/.xinitrc:${C_RESET}"
 echo -e "    ${C_BOLD}exec bspwm${C_RESET}"
