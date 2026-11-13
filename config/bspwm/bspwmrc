@@ -18,6 +18,17 @@ bspc config presel_feedback_color "#6272a4"
 # fix pointer
 xsetroot -cursor_name left_ptr
 
+# Disable screen saver and DPMS sleep
+xset s off -dpms
+xset s noblank
+
+# Prevent system sleep and idle via elogind
+if command -v elogind-inhibit >/dev/null 2>&1; then
+    pkill -f "elogind-inhibit.*Prevent sleep" 2>/dev/null || true
+    elogind-inhibit --what=sleep:idle:handle-suspend-key:handle-hibernate-key:handle-lid-switch \
+        --who="bspwm" --why="Prevent sleep" sleep infinity &
+fi
+
 # gaps
 bspc config gapless_monocle false
 bspc config window_gap 17
