@@ -9,8 +9,7 @@
 
 <!-- INFORMATION -->
 <h1 align="left"> 📖 О сборке</h1> 
-
-<img src="<img src="https://github.com/user-attachments/assets/33f0aee2-c7c7-44c9-81c0-26011b667793"  alt="rice" align="right" width="500px">
+<img src="https://github.com/user-attachments/assets/33f0aee2-c7c7-44c9-81c0-26011b667793"  alt="rice" align="right" width="500px">
 
 
 
