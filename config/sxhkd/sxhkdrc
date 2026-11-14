@@ -15,7 +15,9 @@ super + p
 # Launch Firefox
 super + w
 	firefox-bin
-
+#Launch VS code 
+super + l 
+  vscode
 # Set random wallpaper
 super + alt + w
 	sh $HOME/bin/random_wallpaper
@@ -60,8 +62,6 @@ super + v
     sh $HOME/bin/clipboard-menu
 
 # screenshot
-Print
-    flameshot gui
 
 #
 #
@@ -108,6 +108,10 @@ super + {grave,Tab}
 super + {_,shift + }{1-9,0}
 	bspc {desktop -f,node -d} '^{1-9,10}'
 
+# move window to desktop
+super + alt + {1-9,0}
+	bspc node -d '^{1-9,10}'
+
 #
 # preselect
 #
@@ -143,4 +147,7 @@ super + ctrl + {m,x,y,z}
 # swap the current node and the biggest window
 super + g
 	bspc node -s biggest.window
+#on xclip scriinsoht 
+super + alt + space
+      scrot -s - | xclip -selection clipboard -target image/png
 
