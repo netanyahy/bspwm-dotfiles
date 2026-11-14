@@ -61,8 +61,6 @@ XF86MonBrightness{Up,Down}
 super + v
     sh $HOME/bin/clipboard-menu
 
-# screenshot
-
 #
 #
 # BSPWM HOTKEYS
@@ -148,6 +146,6 @@ super + ctrl + {m,x,y,z}
 super + g
 	bspc node -s biggest.window
 #on xclip scriinsoht 
-super + alt + space
+super + shift + s
       scrot -s - | xclip -selection clipboard -target image/png
 

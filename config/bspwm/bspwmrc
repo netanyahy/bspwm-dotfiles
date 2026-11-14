@@ -62,7 +62,6 @@ pgrep -x redshift > /dev/null || redshift &
 pkill picom; picom --config $HOME/.config/bspwm/picom_configurations/1.conf &
 
 # == autostart ==
-pkill flameshot; flameshot &
 
 # launch clipboard manager daemon
 pkill greenclip; greenclip daemon &
