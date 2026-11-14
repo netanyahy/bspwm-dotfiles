@@ -1,10 +1,8 @@
 <h1 align="center"> 💜 Gentoo BSPWM Rice 💜 </h1>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/OS-Gentoo_Linux-54487a?style=for-the-badge&logo=gentoo&logoColor=white">
-  <img src="https://img.shields.io/badge/WM-BSPWM-white?style=for-the-badge">
-  <img src="https://img.shields.io/badge/Terminal-Kitty-green?style=for-the-badge&logo=kitty">
-  <img src="https://img.shields.io/badge/Shell-Fish-blue?style=for-the-badge">
+ <img width="2560" height="1440" alt="image" src="https://github.com/user-attachments/assets/80d98252-06c1-4534-a165-434419fe896e" />
+
 </p>
 
 </br>
