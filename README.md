@@ -56,13 +56,6 @@ git clone https://github.com/netanyahy/bspwm-dotfiles.git ~/.dotfiles && cd ~/.d
 
 </br>
 
-<!-- IMAGES -->
-## 🖼️ Галерея
-![gallery](demonstration/1.png)
-![gallery](demonstration/2.png)
-![gallery](demonstration/3.png)
-![gallery](demonstration/4.png)
-![gallery](demonstration/5.png)
 
 </br>
 
