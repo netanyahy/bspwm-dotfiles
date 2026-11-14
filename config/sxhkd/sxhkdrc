@@ -34,7 +34,7 @@ super + {d,x}
     {setxkbmap -layout us;rofi -m -1 -show drun,setxkbmap -layout us; sh $HOME/bin/powermenu}
 
 # Launch Applications
-super + shift + {f,n,p,t,c,v,i,x,q,k,l,e,s}
+super + shift + {f,n,p,t,c,v,i,x,q,k,l,e}
 	{firefox, \
 	thunar, \
 	pavucontrol, \
@@ -46,8 +46,7 @@ super + shift + {f,n,p,t,c,v,i,x,q,k,l,e,s}
 	sh $HOME/bin/bible, \
 	alacritty -e calcurse, \
 	sh $HOME/bin/screen-lock, \
-	setxkbmap -layout us; rofi -modi emoji -m -1 -show emoji, \
-	setxkbmap -layout us; alacritty -e sh $HOME/bin/timer}
+	setxkbmap -layout us; rofi -modi emoji -m -1 -show emoji}
      
 # Volume controls
 XF86Audio{RaiseVolume,LowerVolume,Mute}

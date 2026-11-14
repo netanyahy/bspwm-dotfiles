@@ -1,38 +1,39 @@
-
-# Create aliases
+# aliases comand
 alias cls="clear"
 alias g="git"
 alias n="nvim"
 alias m="micro"
-alias cat="bat"
 alias feh="feh --scale-down"
-
-alias reflector_update="sudo reflector --latest 5 --sort rate --save /etc/pacman.d/mirrorlist"
-
-# Display critical errors
-alias syslog_emerg="sudo dmesg --level=emerg,alert,crit"
-
-# Output common errors
-alias syslog="sudo dmesg --level=err,warn"
-
-# Print logs from x server
-alias xlog='grep "(EE)\|(WW)\|error\|failed" ~/.local/share/xorg/Xorg.0.log'
-
-# Remove archived journal files until the disk space they use falls below 100M
-alias vacuum="journalctl --vacuum-size=100M"
-
-# Make all journal files contain no data older than 2 weeks
-alias vacuum_time="journalctl --vacuum-time=2weeks"
+alias vsc="vscode"
+alias celar='clear'
+alias ff='firefox'
 
 set -U fish_greeting
-set fish_color_command green
 set -gx EDITOR micro
 set -gx VISUAL micro
-set -gx BROWSER /usr/bin/firefox
+set -gx BROWSER /usr/bin/firefox-bin
+set -U fish_color_user white
 
+# Цвета текста: весь ввод белый, подсказка (автодополнение) серая
+set -g fish_color_command white
+set -g fish_color_param white
+set -g fish_color_keyword white
+set -g fish_color_quote white
+set -g fish_color_redirection white
+set -g fish_color_end white
+set -g fish_color_error white
+set -g fish_color_operator white
+set -g fish_color_escape white
+set -g fish_color_autosuggestion 555 brblack
+set -g fish_color_cwd white
 
-if status is-interactive
-    # Commands to run in interactive sessions can go here
-    fastfetch
+function prompt_login
+    set_color --bold white
+    echo -n "$USER@$hostname"
+    set_color normal
 end
 
+if status is-interactive
+    # this command run fastfetch in automatical run fish
+    fastfetch
+end
